@@ -1,0 +1,69 @@
+-- [[This is a script that executes a "voice command" based on a specific command in the Roblox chat. 
+This command activates, in the head of the Roblox character and with a certain volume, a sound that at the end takes a certain time to be eliminated
+you can use it as you want, but keep the credits, please
+]]
+
+--[[
+==========================================================
+                   MDB Calternar
+==========================================================
+                Scripted with precision
+==========================================================
+]]
+
+-- config
+local GroupID = 17217626 -- allowed group id
+local TeamName = "DNI" -- allowed team name
+local CommandPrefix = "!vc " -- prefix
+
+-- commands and sounds list
+local voiceCommands = {
+	["back up"] = "rbxassetid://5924839611",
+}
+
+-- services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Teams = game:GetService("Teams")
+
+-- create and store sounds in ReplicatedStorage
+for command, soundId in pairs(voiceCommands) do
+	local sound = Instance.new("Sound")
+	sound.SoundId = soundId
+	sound.Name = command:gsub(" ", "") .. "Sound" -- replaces spaces with nothing for the names
+	sound.Parent = ReplicatedStorage
+end
+sound
+-- plays 
+local function playSound(player, soundName)
+	local character = player.Character
+	if character then
+		local head = character:FindFirstChild("Head")
+		if head then
+			local soundClone = ReplicatedStorage:FindFirstChild(soundName):Clone()
+			soundClone.Parent = head
+			soundClone:Play()
+			game:GetService("Debris"):AddItem(soundClone, 5) -- deletes sound after 5 seconds
+		end
+	end
+end
+
+-- works with chat messages
+local function onChatted(message, player)
+	if message:sub(1, #CommandPrefix) == CommandPrefix then
+		local command = message:sub(#CommandPrefix + 1):lower()
+		if player:GetRankInGroup(GroupID) > 0 and player.Team.Name == TeamName then
+			if voiceCommands[command] then
+				playSound(player, command:gsub(" ", "") .. "Sound")
+			end
+		end
+	end
+end
+
+-- connects player added event
+Players.PlayerAdded:Connect(function(player)
+	player.Chatted:Connect(function(message)
+		onChatted(message, player)
+	end)
+end)
+
