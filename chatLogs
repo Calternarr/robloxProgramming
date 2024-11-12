@@ -1,0 +1,88 @@
+--[[
+nice looking and simple chat logs, there may be some incompatibility regarding the icons but it should not bother you, this chat logs is from roblox and sends a message according to 
+each message that a user sends in the roblox chat to a webhook of discord, I recommend using NewsTargeted as an API for this type of webhooks
+]]
+
+--[[
+==========================================================
+                   MDB Calternar
+==========================================================
+                Scripted with precision
+==========================================================
+]]
+
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local webhook = "webhook"
+
+-- calculate account age
+local function getAccountAge(player)
+	local accountCreationTime = player.AccountAge
+	local years = math.floor(accountCreationTime / 365)
+	local days = accountCreationTime % 365
+	return string.format("%d years and %d days", years, days)
+end
+
+-- send mesg to discord
+local function sendToDiscord(playerName, message, userId, accountAge)
+	local embed = {
+		title = "**" .. playerName .. "**",
+		description = "Mensaje: " .. message,
+		color = 3447003,
+		thumbnail = {
+			url = "http://www.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userId=" .. userId
+		},
+		fields = {
+			{
+				name = "Usuario",
+				value = "[**" .. playerName .. "**](https://www.roblox.com/users/" .. userId .. "/profile)",
+				inline = true
+			},
+			{
+				name = "Tiempo de cuenta",
+				value = accountAge,
+				inline = true
+			}
+		},
+		footer = {
+			text = "Chat Logger",
+			icon_url = "https://cdn.discordapp.com/icons/1273367605033566238/c99a3d9e65ba222883aa6829d0d69ad9.png"
+		}
+	}
+
+	local data = {
+		username = "Chat Logger",
+		avatar_url = "https://cdn.discordapp.com/icons/1273367605033566238/c99a3d9e65ba222883aa6829d0d69ad9.png",  -- Usa la imagen del perfil del webhook
+		embeds = {embed}
+	}
+
+	print("Enviando mensaje a Discord...")
+	local success, response = pcall(function()
+		HttpService:PostAsync(webhook, HttpService:JSONEncode(data))
+	end)
+
+	if success then
+		print("Mensaje enviado correctamente.")
+	else
+		warn("Error al enviar mensaje: " .. tostring(response))
+	end
+end
+
+-- when player joins
+Players.PlayerAdded:Connect(function(plr)
+	print("Jugador añadido: " .. plr.Name)
+
+	-- when player send msg
+	plr.Chatted:Connect(function(msg)
+		print("Mensaje recibido: " .. msg)
+
+		-- verify that the msg doesn't have @ to block mention spamming
+		if not string.find(msg, "@") then
+			local accountAge = getAccountAge(plr)
+			sendToDiscord(plr.Name, msg, plr.UserId, accountAge)
+		else
+			print("Mensaje bloqueado: contiene '@'")
+		end
+	end)
+end)
