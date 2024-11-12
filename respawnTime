@@ -1,0 +1,7 @@
+--[[
+This is a short script I created for a system I bought, it's really insignificant but I'll put it here anyway. This modifies the respawn time of the Roblox character.
+]]
+
+-- this script have been created for the use of the Death UI in the game /propertie of calternar
+
+game.Players.RespawnTime = 15 -- change this number to the ammount of time that you want the players to wait for respawn
