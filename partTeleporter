@@ -1,0 +1,35 @@
+--[[
+a simple teleporter from part to part, it is simple, you just have to have two parts, give it the name you want (as shown in the code) and in the script alike, and a ClickDistance to both parts
+old thingy (can view it as i dont have the regular credits), but it still works and maybe you can find it in a lost account that i have haha
+]]
+
+-- This is a script writed on Luau! Made by calternar on discord.
+
+-- This script stay on the context of a "SourceBlock" and a "DestinationBlock", teleport is from SB to DB; each block use "ClickDetector", that when you click it, it teleports
+-- I will guide you across the short of this code, stay tuned!
+
+local TeleportSource = workspace:FindFirstChild("TeleportDNI1") -- This is to found dedicated Block, you can modify this as you will to find your block
+local TeleportDestination = workspace:FindFirstChild("TeleportDNI2") -- This is to found dedicated Block, you can modify this as you will to find your block
+
+local function onTeleportClicked(player, source, destination) -- function
+	local character = player.Character -- definition
+	if character then
+		character:SetPrimaryPartCFrame(destination.CFrame) -- teleport
+		print("Teleporting " .. player.Name .. " from " .. source.Name .. " to " .. destination.Name) -- Depuration, this is to register or check the code on your Output
+	end
+end
+
+local sourceClickDetector = TeleportSource:FindFirstChild("ClickDetector") -- found "ClickDetector" on source block
+local destinationClickDetector = TeleportDestination:FindFirstChild("ClickDetector") -- same, for destination block
+
+if sourceClickDetector and destinationClickDetector then
+	sourceClickDetector.MouseClick:Connect(function(player)
+		onTeleportClicked(player, TeleportSource, TeleportDestination) -- on click, this will teleport you by source code
+	end)
+
+	destinationClickDetector.MouseClick:Connect(function(player)
+		onTeleportClicked(player, TeleportDestination, TeleportSource) -- same, destination block
+	end)
+end
+
+-- Thx for reading this short code! Stay tuned for more
